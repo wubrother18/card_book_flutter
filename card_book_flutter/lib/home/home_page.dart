@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       counterList.add(Counter(
         editable: editable,
         weight: 0,
+        title: '項目',
       ));
     });
   }

@@ -7,8 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class Counter extends StatefulWidget {
   bool editable;
   int weight;
-  String? title;
-  Counter({super.key, required this.editable, required this.weight, this.title});
+  String title;
+  Counter({super.key, required this.editable, required this.weight, required this.title});
 
   @override
   State<Counter> createState() => _CounterState();
@@ -32,11 +32,11 @@ class _CounterState extends State<Counter> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.title != null){
-      titleController.text = widget.title!;
-    }else{
-      titleController.text = '要計算的目標';
-    }
+    // if(widget.title != null){
+    //   titleController.text = widget.title!;
+    // }else{
+    //   titleController.text = '要計算的目標';
+    // }
   }
 
   @override
