@@ -8,7 +8,8 @@ class Counter extends StatefulWidget {
   bool editable;
   int weight;
   String title;
-  Counter({super.key, required this.editable, required this.weight, required this.title});
+  String color;
+  Counter({super.key, required this.editable, required this.weight, required this.title, required this.color});
 
   @override
   State<Counter> createState() => _CounterState();
@@ -18,7 +19,7 @@ class Counter extends StatefulWidget {
   }
 
   List getData(){
-    return [weight, title];
+    return [weight, title, color];
   }
 }
 
@@ -46,7 +47,7 @@ class _CounterState extends State<Counter> {
       child: Container(
         // padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
-            color: Colors.purple,
+            color: Color(int.parse(widget.color)),
             borderRadius: BorderRadius.circular(20.0)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -59,6 +60,11 @@ class _CounterState extends State<Counter> {
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
               ),
+              onChanged: (value){
+                setState(() {
+                  widget.title = titleController.text;
+                });
+              },
             ),
             // const SizedBox(height: 10.0),
             Text(

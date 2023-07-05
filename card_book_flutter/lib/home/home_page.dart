@@ -1,54 +1,51 @@
+import 'dart:convert';
+
 import 'package:card_book_flutter/counter/counter.dart';
+import 'package:card_book_flutter/model/record_model.dart';
+import 'package:card_book_flutter/static_function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'home_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+
+  List<RecordModel> recordList = [];
+  HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+
+
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  ///建立title controller變數
-  TextEditingController titleController = TextEditingController();
 
-  List<Counter> counterList = [];
-
-  bool editable = true;
+  List<String> items = [];
 
   AppBar _appBar() {
     return AppBar(
       backgroundColor: Colors.blue,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: StaticFunction.colors),
+        ),
+      ),
       title: Center(
-          child: TextField(
+          child: Text(
+        "主畫面",
         textAlign: TextAlign.center,
-        controller: titleController,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.black54),
       )),
       leading: IconButton(
         onPressed: () {},
         icon: const Icon(Icons.menu),
       ),
       actions: [
-        IconButton(
-          onPressed: () {
-            setState(() {
-              editable = !editable;
-              List<Counter> tmpList = [];
-              for (int i = 0; i < counterList.length; i++) {
-                tmpList.add(Counter(
-                  editable: editable,
-                  weight: counterList[i].getData()[0],
-                  title: counterList[i].getData()[1],
-                ));
-              }
-              counterList.clear();
-              counterList= tmpList;
-            });
-          },
-          icon: const Icon(Icons.remove_red_eye),
-        ),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.settings),
@@ -64,11 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      counterList.add(Counter(
-        editable: editable,
-        weight: 0,
-        title: '項目',
-      ));
     });
   }
 
@@ -76,7 +68,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    titleController.text = '改成你要計算的項目';
+    StaticFunction.getInstance().setState(this);
+    reNewList();
+  }
+
+  void reNewList() {
+    if(StaticFunction.prefs.getStringList('mainTree')!=null){
+      items = StaticFunction.prefs.getStringList('mainTree')!;
+    }
+    items.add('{"id": "","position": "","count": 0,"title": "按一下新增分類","type": "","colors":["0xffffffff","0","0xffffffff"],"childList":[]}');
+    for(int i = 0;i<items!.length;i++){
+      Map<String,dynamic> map = jsonDecode(items[i]);
+      widget.recordList.add(RecordModel.fromJson(map));
+    }
   }
 
   @override
@@ -84,46 +88,28 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement build
     return Scaffold(
       appBar: _appBar(),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, //每行三列
-          childAspectRatio: 0.8, //顯示區域寬高相等
-        ),
-        itemCount: counterList.length,
-        itemBuilder: (context, index) {
-          return counterList[index];
-        },
-      ),
-      floatingActionButton: Container(
+      body: Container(
         decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.all(Radius.circular(90)),
+          gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                StaticFunction.colors[2],
+                StaticFunction.colors[1],
+                StaticFunction.colors[0]
+              ]),
         ),
-        child: PopupMenuButton(
-          icon: const Icon(Icons.add, color: Colors.white),
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem(
-                value: 0,
-                child: TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.timer),
-                    label: const Text('新增計數項目')),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.folder),
-                    label: const Text('新增分類項目')),
-              ),
-            ];
-          },
-          onSelected: (value) {
-            _incrementCounter();
-          },
-        ),
+        child: ListView.builder(
+            itemCount: widget.recordList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return HomeListItem(
+                title: widget.recordList[index].title,
+                colors: widget.recordList[index].colors,
+                childList: widget.recordList[index].childList,
+              );
+            }),
       ),
     );
   }
+
 }
