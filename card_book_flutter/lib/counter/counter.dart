@@ -33,11 +33,11 @@ class _CounterState extends State<Counter> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // if(widget.title != null){
-    //   titleController.text = widget.title!;
-    // }else{
+    if(widget.title != null){
+      titleController.text = widget.title!;
+    }else{
     //   titleController.text = '要計算的目標';
-    // }
+    }
   }
 
   @override

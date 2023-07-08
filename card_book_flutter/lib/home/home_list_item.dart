@@ -8,37 +8,45 @@ class HomeListItem extends StatefulWidget {
   final String title;
   final List<String> colors;
   final List<String> childList;
+  final Function(String value) voidCallback;
 
   const HomeListItem(
       {super.key,
       required this.title,
       required this.colors,
-      required this.childList});
+      required this.childList,
+      required this.voidCallback});
 
   @override
   State<HomeListItem> createState() => _HomeListItemState();
 }
 
 class _HomeListItemState extends State<HomeListItem> {
-
-  void onItemSelect(){
-    if(widget.childList.isNotEmpty){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: "0")));
-    }else{
-      StaticFunction.getInstance().addItemOfHome();
+  void onItemSelect() {
+    if (widget.childList.isNotEmpty) {
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: "0")));
+      widget.voidCallback.call("select");
+    } else {
+      // StaticFunction.getInstance().addItemOfHome();
+      widget.voidCallback.call("add");
     }
   }
 
-  void onItemDelete(){
-    StaticFunction.getInstance().deleteItemOfHome(0);
+  void onItemDelete() {
+    // StaticFunction.getInstance().deleteItemOfHome(0);
+    widget.voidCallback.call("delete");
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return GestureDetector(
-      onTap: () {onItemSelect();},
-      onLongPress: (){onItemDelete();},
+      onTap: () {
+        onItemSelect();
+      },
+      onLongPress: () {
+        onItemDelete();
+      },
       child: Center(
         child: Container(
           padding: EdgeInsets.all(4.w),
@@ -65,6 +73,5 @@ class _HomeListItemState extends State<HomeListItem> {
         ),
       ),
     );
-
   }
 }

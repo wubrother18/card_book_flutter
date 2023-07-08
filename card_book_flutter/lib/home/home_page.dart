@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../counter/counter_page.dart';
 import 'home_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -76,10 +77,27 @@ class _HomeScreenState extends State<HomeScreen> {
     if(StaticFunction.prefs.getStringList('mainTree')!=null){
       items = StaticFunction.prefs.getStringList('mainTree')!;
     }
+    widget.recordList.clear();
     items.add('{"id": "","position": "","count": 0,"title": "按一下新增分類","type": "","colors":["0xffffffff","0","0xffffffff"],"childList":[]}');
     for(int i = 0;i<items!.length;i++){
       Map<String,dynamic> map = jsonDecode(items[i]);
       widget.recordList.add(RecordModel.fromJson(map));
+    }
+  }
+
+  Future<void> startForResult(String value) async {
+    if(value.contains("select")){
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: "0")));
+    }else  if(value.contains("add")){
+      await StaticFunction.getInstance().addItemOfHome();
+    }else  if(value.contains("delete")){
+      await StaticFunction.getInstance().deleteItemOfHome(0);
+    }
+
+    if(mounted){
+      setState(() {
+        reNewList();
+      });
     }
   }
 
@@ -106,6 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: widget.recordList[index].title,
                 colors: widget.recordList[index].colors,
                 childList: widget.recordList[index].childList,
+                voidCallback: (value) {
+                  startForResult(value);
+                },
               );
             }),
       ),
