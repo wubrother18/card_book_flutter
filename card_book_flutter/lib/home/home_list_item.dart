@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeListItem extends StatefulWidget {
+  final String id;
   final String title;
   final List<String> colors;
   final List<String> childList;
@@ -15,7 +16,8 @@ class HomeListItem extends StatefulWidget {
       required this.title,
       required this.colors,
       required this.childList,
-      required this.voidCallback});
+      required this.voidCallback,
+      required this.id});
 
   @override
   State<HomeListItem> createState() => _HomeListItemState();
@@ -25,7 +27,7 @@ class _HomeListItemState extends State<HomeListItem> {
   void onItemSelect() {
     if (widget.childList.isNotEmpty) {
       // Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: "0")));
-      widget.voidCallback.call("select");
+      widget.voidCallback.call("select:${widget.id}");
     } else {
       // StaticFunction.getInstance().addItemOfHome();
       widget.voidCallback.call("add");

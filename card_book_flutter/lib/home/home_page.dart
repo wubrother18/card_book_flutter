@@ -69,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    StaticFunction.getInstance().setState(this);
     reNewList();
   }
 
@@ -87,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> startForResult(String value) async {
     if(value.contains("select")){
-      await Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: "0")));
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => CounterPage(parentId: value.split(":")[1],title: "",)));
     }else  if(value.contains("add")){
       await StaticFunction.getInstance().addItemOfHome();
     }else  if(value.contains("delete")){
@@ -107,20 +106,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _appBar(),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                StaticFunction.colors[2],
-                StaticFunction.colors[1],
-                StaticFunction.colors[0]
-              ]),
-        ),
+        padding: EdgeInsets.all(8.w),
+        // decoration: BoxDecoration(
+        //   gradient: LinearGradient(
+        //       begin: Alignment.bottomCenter,
+        //       end: Alignment.topCenter,
+        //       colors: [
+        //         StaticFunction.colors[2],
+        //         StaticFunction.colors[1],
+        //         StaticFunction.colors[0]
+        //       ]),
+        // ),
         child: ListView.builder(
             itemCount: widget.recordList.length,
             itemBuilder: (BuildContext context, int index) {
               return HomeListItem(
+                id:widget.recordList[index].id,
                 title: widget.recordList[index].title,
                 colors: widget.recordList[index].colors,
                 childList: widget.recordList[index].childList,
