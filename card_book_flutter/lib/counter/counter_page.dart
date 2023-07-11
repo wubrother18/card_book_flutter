@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:card_book_flutter/chart/pie_chart_sample2.dart';
+import 'package:card_book_flutter/dialog/dialog_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -40,66 +41,122 @@ class _CounterPageState extends State<CounterPage> {
         textAlign: TextAlign.center,
         style: TextStyle(color: Colors.white, fontSize: 20.w),
       )),
-      leading: int.parse(widget.parentId) == 0 ? IconButton(
-        onPressed: () {
-
-        },
-        icon: const Icon(Icons.home),
-      ) : IconButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        icon: const Icon(Icons.arrow_back_sharp),
-      ),
+      leading: int.parse(widget.parentId) == 0
+          ? IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.home),
+            )
+          : IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back_sharp),
+            ),
       actions: [
-        selectMode? IconButton(
-          onPressed: () {
-            if(selectList.isNotEmpty){
-              for (int i =0;i<selectList.length;i++){
-                _decrementCounter(selectList[i].toString());
-              }
-            }
-          },
-          icon: const Icon(Icons.delete),
-        ): IconButton(
-          onPressed: () {
-            editable = !editable;
-            _reloadList();
-          },
-          icon: const Icon(Icons.remove_red_eye),
-        ),
-        selectMode?IconButton(
-          onPressed: () {
-            if(selectList.length == 2) {
-              _swapCounter(selectList[0],selectList[1]);
-            }
-          },
-          icon: const Icon(Icons.swap_horiz),
-        ):IconButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PieChartSample2(
-                          dataList: counterList,
-                        )));
-          },
-          icon: const Icon(Icons.compare),
-        ),
-        IconButton(
-          onPressed: () {
-            // ///testing code
-            // String? tmpChild =
-            //     StaticFunction.prefs.getString("${widget.parentId}_ch");
-            // String selectId = "";
-            // if (tmpChild != null) {
-            //   selectId = tmpChild.split(",")[0];
-            // }
-            // _decrementCounter(selectId);
-
-          },
-          icon: const Icon(Icons.settings),
-        ),
+        selectMode
+            ? IconButton(
+                onPressed: () {
+                  if (selectList.isNotEmpty) {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return DialogHelper.showWarning(context, "Delete",
+                              "Do you want to delete them all?", "YES", () {
+                            Navigator.pop(context);
+                            for (int i = 0; i < selectList.length; i++) {
+                              _decrementCounter(selectList[i].toString());
+                            }
+                          });
+                        });
+                  }
+                },
+                icon: const Icon(Icons.delete),
+              )
+            : IconButton(
+                onPressed: () {
+                  editable = !editable;
+                  _reloadList();
+                },
+                icon: const Icon(Icons.remove_red_eye),
+              ),
+        selectMode
+            ? IconButton(
+                onPressed: () {
+                  if (selectList.length == 2) {
+                    _swapCounter(selectList[0], selectList[1]);
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return DialogHelper.showWarning(context, "Switch",
+                              "Please select two item to swap.", "OK", () {
+                            Navigator.pop(context);
+                          });
+                        });
+                  }
+                },
+                icon: const Icon(Icons.swap_horiz),
+              )
+            : IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PieChartSample2(
+                                dataList: counterList,
+                              )));
+                },
+                icon: const Icon(Icons.compare),
+              ),
+        selectMode
+            ? IconButton(
+                onPressed: () {
+                  if (selectList.length == 1) {
+                    Map<String, String> data = {};
+                    data['color'] =
+                        StaticFunction.prefs.getString("${selectList[0]}_c")!;
+                    data['value'] =
+                        StaticFunction.prefs.getString("${selectList[0]}_v")!;
+                    data['title'] =
+                        StaticFunction.prefs.getString("${selectList[0]}_t")!;
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return DialogHelper.showCounterEdit(context, data,
+                              (data) {
+                            _editCounter(selectList[0], data);
+                            Navigator.pop(context);
+                          });
+                        });
+                  } else if (selectList.length > 1) {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return DialogHelper.showWarning(
+                              context,
+                              "Edit",
+                              "Please select only one item at a time to edit.",
+                              "OK", () {
+                            Navigator.pop(context);
+                          });
+                        });
+                  }
+                },
+                icon: const Icon(Icons.edit),
+              )
+            : IconButton(
+                onPressed: () {
+                  // ///testing code
+                  // String? tmpChild =
+                  //     StaticFunction.prefs.getString("${widget.parentId}_ch");
+                  // String selectId = "";
+                  // if (tmpChild != null) {
+                  //   selectId = tmpChild.split(",")[0];
+                  // }
+                  // _decrementCounter(selectId);
+                },
+                icon: const Icon(Icons.settings),
+              ),
       ],
     );
   }
@@ -113,16 +170,28 @@ class _CounterPageState extends State<CounterPage> {
     await StaticFunction.getInstance()
         .deleteCounter(int.parse(selectId), int.parse(widget.parentId));
     _reloadList();
-    if(counterList.isEmpty){
+    if (counterList.isEmpty) {
       editable = true;
       setState(() {
-        selectMode = !selectMode;
+        selectMode = false;
       });
     }
   }
 
-  void _swapCounter (int selectId1, int selectId2) async {
-    await StaticFunction.getInstance().exchangeCounter(selectId1, selectId2, int.parse(widget.parentId));
+  void _swapCounter(int selectId1, int selectId2) async {
+    await StaticFunction.getInstance()
+        .exchangeCounter(selectId1, selectId2, int.parse(widget.parentId));
+    _reloadList();
+  }
+
+  void _editCounter(int selectId, data) async {
+    Future.delayed(Duration.zero, () {
+      StaticFunction.getInstance().editCounter(selectId, data);
+    });
+  }
+
+  void _incrementCategory() async {
+    await StaticFunction.getInstance().addCategory(int.parse(widget.parentId));
     _reloadList();
   }
 
@@ -138,12 +207,13 @@ class _CounterPageState extends State<CounterPage> {
     for (int i = 0; i < tmpChildList.length; i++) {
       tmpList.add(Counter(
         editable: editable,
-        weight:
+        value:
             int.parse(StaticFunction.prefs.getString("${tmpChildList[i]}_v")!),
         title: StaticFunction.prefs.getString("${tmpChildList[i]}_t")!,
         color: StaticFunction.prefs.getString("${tmpChildList[i]}_c")!,
+        isCategory: StaticFunction.prefs.containsKey("${tmpChildList[i]}_ch"),
         id: int.parse(tmpChildList[i]),
-        callback: (value){
+        callback: (value) {
           _callback(value);
         },
         selectMode: selectMode,
@@ -161,11 +231,11 @@ class _CounterPageState extends State<CounterPage> {
     });
   }
 
-  void _callback (int selectId) {
-    if(selectId == 0) {
-      if(selectMode){
+  void _callback(int selectId) {
+    if (selectId == 0) {
+      if (selectMode) {
         editable = true;
-      }else {
+      } else {
         editable = false;
       }
       setState(() {
@@ -173,8 +243,12 @@ class _CounterPageState extends State<CounterPage> {
       });
       _reloadList();
       selectList.clear();
+    } else if (selectId < 0) {
+      int id = 0 - selectId;
+      var widget = CounterPage(parentId: id.toString(), title: StaticFunction.prefs.getString("${id}_t")!);
+      startForResult(widget);
     } else {
-      if(selectList.contains(selectId)){
+      if (selectList.contains(selectId)) {
         selectList.remove(selectId);
       } else {
         selectList.add(selectId);
@@ -240,7 +314,9 @@ class _CounterPageState extends State<CounterPage> {
               PopupMenuItem(
                 value: 1,
                 child: TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      _incrementCategory();
+                    },
                     icon: const Icon(Icons.folder),
                     label: const Text('新增分類項目')),
               ),
@@ -252,5 +328,19 @@ class _CounterPageState extends State<CounterPage> {
         ),
       ),
     );
+  }
+
+  void startForResult(Widget widget) async {
+
+    /// do switch and prepare
+
+    /// goto widget
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => widget));
+
+    /// back with result
+    if(mounted){
+      _reloadList();
+    }
   }
 }

@@ -57,12 +57,12 @@ class PieChart2State extends State<PieChartSample2> {
     // TODO: implement initState
     super.initState();
     for (int i = 0; i < widget.dataList.length; i++) {
-      if (widget.dataList.elementAt(i).weight > 0) {
-        sum += widget.dataList.elementAt(i).weight;
+      if (widget.dataList.elementAt(i).value > 0) {
+        sum += widget.dataList.elementAt(i).value;
         indList.add(Indicator(
           color: Color(int.parse(widget.dataList.elementAt(i).color)),
           text: widget.dataList.elementAt(i).title,
-          count: widget.dataList.elementAt(i).weight ,
+          count: widget.dataList.elementAt(i).value ,
           isSquare: true,
         ));
       }
