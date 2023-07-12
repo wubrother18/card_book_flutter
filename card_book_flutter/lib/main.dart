@@ -1,5 +1,4 @@
 import 'package:card_book_flutter/counter/counter_page.dart';
-import 'package:card_book_flutter/home/home_page.dart';
 import 'package:card_book_flutter/static_function.dart';
 import 'package:card_book_flutter/tool/hide_keyboard.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +22,7 @@ void main() async {
   ]);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   StaticFunction.prefs = prefs;
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 
@@ -35,6 +36,8 @@ class MyApp extends StatelessWidget {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     StaticFunction.prefs = prefs;
   }
+
+
     // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

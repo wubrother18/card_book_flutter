@@ -2,9 +2,12 @@ import 'dart:math';
 
 import 'package:card_book_flutter/chart/pie_chart_sample2.dart';
 import 'package:card_book_flutter/dialog/dialog_helper.dart';
+import 'package:card_book_flutter/setting/about.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../admob/ad_helper.dart';
 import '../static_function.dart';
 import 'counter.dart';
 
@@ -25,6 +28,9 @@ class _CounterPageState extends State<CounterPage> {
   bool editable = true;
   bool selectMode = false;
 
+  // COMPLETE: Add _interstitialAd
+  InterstitialAd? _interstitialAd;
+
   AppBar _appBar() {
     return AppBar(
       flexibleSpace: Container(
@@ -39,7 +45,7 @@ class _CounterPageState extends State<CounterPage> {
           child: Text(
         widget.title,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.white, fontSize: 20.w),
+        style: TextStyle(color: Colors.black, fontSize: 20.w),
       )),
       leading: int.parse(widget.parentId) == 0
           ? IconButton(
@@ -99,12 +105,23 @@ class _CounterPageState extends State<CounterPage> {
               )
             : IconButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PieChartSample2(
-                                dataList: counterList,
-                              )));
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => PieChartSample2(
+                  //               dataList: counterList,
+                  //             )));
+                  if (_interstitialAd != null) {
+                    _interstitialAd?.show();
+                  } else {
+                    _loadInterstitialAd();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PieChartSample2(
+                                  dataList: counterList,
+                                )));
+                  }
                 },
                 icon: const Icon(Icons.compare),
               ),
@@ -113,6 +130,9 @@ class _CounterPageState extends State<CounterPage> {
                 onPressed: () {
                   if (selectList.length == 1) {
                     Map<String, String> data = {};
+                    if(StaticFunction.prefs.containsKey("${selectList[0]}_ch")){
+                      data['category'] = "1";
+                    }
                     data['color'] =
                         StaticFunction.prefs.getString("${selectList[0]}_c")!;
                     data['value'] =
@@ -144,20 +164,30 @@ class _CounterPageState extends State<CounterPage> {
                 },
                 icon: const Icon(Icons.edit),
               )
-            : IconButton(
-                onPressed: () {
-                  // ///testing code
-                  // String? tmpChild =
-                  //     StaticFunction.prefs.getString("${widget.parentId}_ch");
-                  // String selectId = "";
-                  // if (tmpChild != null) {
-                  //   selectId = tmpChild.split(",")[0];
-                  // }
-                  // _decrementCounter(selectId);
-                },
-                icon: const Icon(Icons.settings),
-              ),
+            : Container()
+        //     IconButton(
+        //         onPressed: () {
+        //           // ///testing code
+        //           // String? tmpChild =
+        //           //     StaticFunction.prefs.getString("${widget.parentId}_ch");
+        //           // String selectId = "";
+        //           // if (tmpChild != null) {
+        //           //   selectId = tmpChild.split(",")[0];
+        //           // }
+        //           // _decrementCounter(selectId);
+        //         },
+        //         icon: const Icon(Icons.settings),
+        //       ),
       ],
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: Text(message),
+      ),
     );
   }
 
@@ -185,9 +215,8 @@ class _CounterPageState extends State<CounterPage> {
   }
 
   void _editCounter(int selectId, data) async {
-    Future.delayed(Duration.zero, () {
-      StaticFunction.getInstance().editCounter(selectId, data);
-    });
+   await StaticFunction.getInstance().editCounter(selectId, data);
+    _reloadList();
   }
 
   void _incrementCategory() async {
@@ -245,7 +274,9 @@ class _CounterPageState extends State<CounterPage> {
       selectList.clear();
     } else if (selectId < 0) {
       int id = 0 - selectId;
-      var widget = CounterPage(parentId: id.toString(), title: StaticFunction.prefs.getString("${id}_t")!);
+      var widget = CounterPage(
+          parentId: id.toString(),
+          title: StaticFunction.prefs.getString("${id}_t")!);
       startForResult(widget);
     } else {
       if (selectList.contains(selectId)) {
@@ -260,6 +291,7 @@ class _CounterPageState extends State<CounterPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadInterstitialAd();
     if (StaticFunction.prefs.getString("${widget.parentId}_ch") != null) {
       _reloadList();
     }
@@ -293,45 +325,104 @@ class _CounterPageState extends State<CounterPage> {
           },
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.all(Radius.circular(90)),
-        ),
-        child: PopupMenuButton(
-          icon: const Icon(Icons.add, color: Colors.white),
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem(
-                value: 0,
-                child: TextButton.icon(
-                    onPressed: () {
-                      _incrementCounter();
-                    },
-                    icon: const Icon(Icons.timer),
-                    label: const Text('新增計數項目')),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: editable
+          ? Container(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.all(Radius.circular(90)),
               ),
-              PopupMenuItem(
-                value: 1,
-                child: TextButton.icon(
-                    onPressed: () {
-                      _incrementCategory();
-                    },
-                    icon: const Icon(Icons.folder),
-                    label: const Text('新增分類項目')),
+              child: PopupMenuButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem(
+                      value: 0,
+                      child: TextButton.icon(
+                          onPressed: () {
+                            _incrementCounter();
+                          },
+                          icon: const Icon(Icons.timer),
+                          label: const Text('新增計數項目')),
+                    ),
+                    PopupMenuItem(
+                      value: 1,
+                      child: TextButton.icon(
+                          onPressed: () {
+                            _incrementCategory();
+                          },
+                          icon: const Icon(Icons.folder),
+                          label: const Text('新增分類項目')),
+                    ),
+                  ];
+                },
+                onSelected: (value) {
+                  _incrementCounter();
+                },
               ),
-            ];
-          },
-          onSelected: (value) {
-            _incrementCounter();
-          },
-        ),
-      ),
+            )
+          : null,
+      bottomNavigationBar: editable
+          ? BottomAppBar(
+              padding: EdgeInsets.zero,
+              height: 50.h,
+              notchMargin: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: StaticFunction.colors),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.shopping_cart,
+                        // color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _showSnackBar("More exciting features coming soon!");
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.add_to_drive,
+                        // color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _showSnackBar("upload to google drive");
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.settings,
+                        // color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _showSnackBar("Change settings or see licenses");
+                        startForResult(AboutPage());
+                      },
+                    ),
+                    SizedBox(),
+                  ],
+                ),
+              ),
+            )
+          : null,
     );
   }
 
-  void startForResult(Widget widget) async {
+  @override
+  void dispose() {
+    // COMPLETE: Dispose an InterstitialAd object
+    _interstitialAd?.dispose();
 
+    super.dispose();
+  }
+
+  void startForResult(Widget widget) async {
     /// do switch and prepare
 
     /// goto widget
@@ -339,8 +430,38 @@ class _CounterPageState extends State<CounterPage> {
         context, MaterialPageRoute(builder: (context) => widget));
 
     /// back with result
-    if(mounted){
+    if (mounted) {
       _reloadList();
     }
+  }
+
+  // COMPLETE: Implement _loadInterstitialAd()
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _interstitialAd = null;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PieChartSample2(
+                            dataList: counterList,
+                          )));
+            },
+          );
+
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          debugPrint('Failed to load an interstitial ad: ${err.message}');
+        },
+      ),
+    );
   }
 }

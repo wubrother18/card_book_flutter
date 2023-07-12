@@ -80,7 +80,7 @@ class _CounterState extends State<Counter> {
               });
               widget.callback?.call(widget.id);
             } else if (widget.isCategory!) {
-              widget.callback?.call( 0 - widget.id );
+              widget.callback?.call(0 - widget.id);
             }
           },
           onLongPress: () {
@@ -100,172 +100,169 @@ class _CounterState extends State<Counter> {
   ///建立計數器
   Widget _buildCounter() {
     return Container(
-      // padding: EdgeInsets.all(8.w),
-      decoration: BoxDecoration(
-          color: Color(int.parse(widget.color)),
-          border: widget.selected
-              ? Border.all(
+          // padding: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+              color: Color(int.parse(widget.color)),
+              border: widget.selected
+                  ? Border.all(
                   color: Colors.white, width: 4.w, style: BorderStyle.solid)
-              : null,
-          borderRadius: BorderRadius.circular(20.0)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          TextField(
-            textAlign: TextAlign.center,
-            controller: titleController,
-            style: TextStyle(
-              fontSize: 18.w,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-            onChanged: (value) {
-              setState(() {
-                widget.title = titleController.text;
-              });
-            },
-          ),
-          // const SizedBox(height: 10.0),
-          Text(
-            "${widget.value}",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 30.w,
-            ),
-          ),
-          // const SizedBox(height: 10.0),
-          widget.editable
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    GestureDetector(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.blue,
-                        ),
-                        width: ScreenUtil().screenWidth / 9,
-                        height: ScreenUtil().screenWidth / 9,
-                        child: Center(
-                          child: Container(
-                            color: Colors.white,
-                            width: ScreenUtil().screenWidth / 27,
-                            height: 5.0,
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if (widget.value > 0) widget.value--;
-                        });
-                      },
-                      onTapDown: (TapDownDetails details) {
-                        print('down');
-                        changeValue = true;
-                        _timer =
-                            Timer.periodic(Duration(milliseconds: 100), (t) {
-                          setState(() {
-                            if (widget.value > 0) widget.value--;
-                          });
-                          print('value ${widget.value}');
-                        });
-                      },
-                      onTapUp: (TapUpDetails details) {
-                        print('up');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                      onTapCancel: () {
-                        print('cancel');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                      onLongPressStart: (details) {
-                        print('start');
-                        changeValue = true;
-                        _timer =
-                            Timer.periodic(Duration(milliseconds: 100), (t) {
-                          setState(() {
-                            if (widget.value > 0) widget.value--;
-                          });
-                          print('value ${widget.value}');
-                        });
-                      },
-                      onLongPressEnd: (detail) {
-                        print('end');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                    ),
-                    const SizedBox(width: 10.0),
-                    GestureDetector(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.blue,
-                        ),
-                        width: ScreenUtil().screenWidth / 9,
-                        height: ScreenUtil().screenWidth / 9,
-                        child: Center(
-                          child: Icon(
-                            Icons.add,
-                            size: ScreenUtil().screenWidth * 2 / 27,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          widget.value++;
-                        });
-                      },
-                      onTapDown: (TapDownDetails details) {
-                        print('down');
-                        changeValue = true;
-                        _timer =
-                            Timer.periodic(Duration(milliseconds: 100), (t) {
-                          setState(() {
-                            widget.value++;
-                          });
-                          print('value ${widget.value}');
-                        });
-                      },
-                      onTapUp: (TapUpDetails details) {
-                        print('up');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                      onTapCancel: () {
-                        print('cancel');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                      onLongPressStart: (details) {
-                        print('start');
-                        changeValue = true;
-                        _timer =
-                            Timer.periodic(Duration(milliseconds: 100), (t) {
-                          setState(() {
-                            widget.value++;
-                          });
-                          print('value ${widget.value}');
-                        });
-                      },
-                      onLongPressEnd: (details) {
-                        print('end');
-                        _timer.cancel();
-                        _changeValue();
-                      },
-                    ),
-                  ],
-                )
-              : Container(
-                  height: ScreenUtil().screenWidth / 9,
+                  : null,
+              borderRadius: BorderRadius.circular(20.0)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(height: 12.h,),
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18.w,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
-        ],
-      ),
-    );
+
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                "${widget.value}",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30.w,
+                ),
+              ),
+              // const SizedBox(height: 10.0),
+              widget.editable
+                  ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue,
+                      ),
+                      width: ScreenUtil().screenWidth / 9,
+                      height: ScreenUtil().screenWidth / 9,
+                      child: Center(
+                        child: Container(
+                          color: Colors.white,
+                          width: ScreenUtil().screenWidth / 27,
+                          height: 5.0,
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        if (widget.value > 0) widget.value--;
+                      });
+                    },
+                    onTapDown: (TapDownDetails details) {
+                      print('down');
+                      changeValue = true;
+                      _timer =
+                          Timer.periodic(Duration(milliseconds: 100), (t) {
+                            setState(() {
+                              if (widget.value > 0) widget.value--;
+                            });
+                            print('value ${widget.value}');
+                          });
+                    },
+                    onTapUp: (TapUpDetails details) {
+                      print('up');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                    onTapCancel: () {
+                      print('cancel');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                    onLongPressStart: (details) {
+                      print('start');
+                      changeValue = true;
+                      _timer =
+                          Timer.periodic(Duration(milliseconds: 100), (t) {
+                            setState(() {
+                              if (widget.value > 0) widget.value--;
+                            });
+                            print('value ${widget.value}');
+                          });
+                    },
+                    onLongPressEnd: (detail) {
+                      print('end');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                  ),
+                  const SizedBox(width: 10.0),
+                  GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blue,
+                      ),
+                      width: ScreenUtil().screenWidth / 9,
+                      height: ScreenUtil().screenWidth / 9,
+                      child: Center(
+                        child: Icon(
+                          Icons.add,
+                          size: ScreenUtil().screenWidth * 2 / 27,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        widget.value++;
+                      });
+                    },
+                    onTapDown: (TapDownDetails details) {
+                      print('down');
+                      changeValue = true;
+                      _timer =
+                          Timer.periodic(Duration(milliseconds: 100), (t) {
+                            setState(() {
+                              widget.value++;
+                            });
+                            print('value ${widget.value}');
+                          });
+                    },
+                    onTapUp: (TapUpDetails details) {
+                      print('up');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                    onTapCancel: () {
+                      print('cancel');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                    onLongPressStart: (details) {
+                      print('start');
+                      changeValue = true;
+                      _timer =
+                          Timer.periodic(Duration(milliseconds: 100), (t) {
+                            setState(() {
+                              widget.value++;
+                            });
+                            print('value ${widget.value}');
+                          });
+                    },
+                    onLongPressEnd: (details) {
+                      print('end');
+                      _timer.cancel();
+                      _changeValue();
+                    },
+                  ),
+                ],
+              )
+                  : Container(
+                height: ScreenUtil().screenWidth / 9,
+              ),
+            ],
+          ),
+        );
   }
 
   ///建立分類
@@ -288,21 +285,17 @@ class _CounterState extends State<Counter> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          TextField(
+          SizedBox(height: 12.h,),
+          Text(
+            widget.title,
             textAlign: TextAlign.center,
-            controller: titleController,
             style: TextStyle(
               fontSize: 18.w,
               fontWeight: FontWeight.w500,
               color: Colors.white,
             ),
-            onChanged: (value) {
-              setState(() {
-                widget.title = titleController.text;
-              });
-            },
           ),
-          // const SizedBox(height: 10.0),
+          SizedBox(height: 8.h),
           Text(
             "${widget.value}",
             style: TextStyle(
