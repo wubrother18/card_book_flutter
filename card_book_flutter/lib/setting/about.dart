@@ -38,8 +38,16 @@ class _AboutPageState extends State<AboutPage> {
         onPressed: () {
           Navigator.pop(context);
         },
-        icon: const Icon(Icons.arrow_back_sharp),
+        icon: Icon(
+          Icons.arrow_back_sharp,
+          size: 22.w,
+        ),
       ),
+      actions: [
+        SizedBox(
+          width: 40.w,
+        )
+      ],
     );
   }
 
