@@ -4,33 +4,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DialogHelper {
-  static AlertDialog showWarning (BuildContext context,title,descriptions,text, Function callback) {
+  static AlertDialog showWarning(
+      BuildContext context, title, descriptions, text, Function callback) {
     return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      content: _warningContentBox(context, title, descriptions, text,callback),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      content: _warningContentBox(context, title, descriptions, text, callback),
     );
   }
 
-  static Widget showCounterEdit (BuildContext context, Map<String, String> data, Function positive) {
+  static Widget showCounterEdit(
+      BuildContext context, Map<String, String> data, Function positive) {
     String titleText = "Counter Edit";
     bool isCategory = false;
-    if(data.containsKey('category')){
+    if (data.containsKey('category')) {
       titleText = "Category Edit";
       isCategory = true;
     }
-    return  _counterEditContentBox(context, titleText, "SAVE", isCategory, data, positive);
+    return _counterEditContentBox(
+        context, titleText, "SAVE", isCategory, data, positive);
   }
 
-  static Widget _warningContentBox(context,title,descriptions,text,callback) {
+  static Widget showChoiceDialog(
+      BuildContext context, title, descriptions, List<String> textList, Function callback) {
+    List<Widget> actions = [];
+    for(int i = 0; i<textList.length;i++){
+      actions.add( MaterialButton(
+          color: Colors.teal,
+          onPressed: () {
+           callback.call(i);
+          },
+          child: Text(
+            textList[i],
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white),
+          )),);
+    }
+    return AlertDialog(
+      title: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 22.w,
+        ),
+      ),
+      content: Text(
+        descriptions,
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 14.w,
+        ),
+      ),
+      actions: actions,
+    );
+  }
+
+  static Widget _warningContentBox(
+      context, title, descriptions, text, callback) {
     return Stack(
       children: <Widget>[
         Container(
           padding:
-          const EdgeInsets.only(left: 25, top: 50, right: 25, bottom: 25),
+              const EdgeInsets.only(left: 25, top: 50, right: 25, bottom: 25),
           margin: const EdgeInsets.only(top: 40),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
@@ -46,7 +85,7 @@ class DialogHelper {
               Text(
                 title,
                 style:
-                const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 15,
@@ -83,7 +122,7 @@ class DialogHelper {
             radius: 40,
             child: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(25)),
-              child: Icon(Icons.warning,color: Colors.amberAccent, size: 60 ),
+              child: Icon(Icons.warning, color: Colors.amberAccent, size: 60),
             ),
           ),
         ),
@@ -91,8 +130,8 @@ class DialogHelper {
     );
   }
 
-  static Widget _counterEditContentBox(context, title, text, isCategory, Map<String, String> data, positive) {
-
+  static Widget _counterEditContentBox(
+      context, title, text, isCategory, Map<String, String> data, positive) {
     return EditDialog(title, text, isCategory, data, positive);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:card_book_flutter/dialog/dialog_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -216,7 +217,29 @@ class _EditDialogState extends State<EditDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (widget.data['color'] !=
+                                      colorController.text ||
+                                  widget.data['value'] !=
+                                      valueController.text ||
+                                  widget.data['title'] !=
+                                      titleController.text) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return DialogHelper.showWarning(
+                                          context,
+                                          "Change Lost",
+                                          "If you haven't save yet. New data change might be lost.",
+                                          "Ignore",
+                                          () {
+                                            widget.positive.call(widget.data, 1);
+                                          });
+                                    });
+                              } else {
+                                widget.positive.call(widget.data, 1);
+                              }
+                            },
                             icon: Icon(
                               Icons.note_add,
                               size: 30.w,
@@ -224,7 +247,9 @@ class _EditDialogState extends State<EditDialog> {
                             tooltip: "add new note",
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              widget.positive.call(widget.data, 2);
+                            },
                             icon: Icon(
                               Icons.pageview,
                               size: 30.w,
@@ -239,7 +264,7 @@ class _EditDialogState extends State<EditDialog> {
                                   widget.data['color'] = colorController.text;
                                   widget.data['value'] = valueController.text;
                                   widget.data['title'] = titleController.text;
-                                  widget.positive.call(widget.data);
+                                  widget.positive.call(widget.data, 0);
                                 },
                                 child: Text(
                                   widget.text,
@@ -268,7 +293,7 @@ class _EditDialogState extends State<EditDialog> {
                                   widget.data['color'] = colorController.text;
                                   widget.data['value'] = valueController.text;
                                   widget.data['title'] = titleController.text;
-                                  widget.positive.call(widget.data);
+                                  widget.positive.call(widget.data, 0);
                                 },
                                 child: Text(
                                   widget.text,

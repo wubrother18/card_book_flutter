@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -147,6 +148,38 @@ class StaticFunction {
       await prefs.setString('${parentId}_v', finalValue.toString());
     }
 
+  }
+
+  Future<int> editRecord (int parentId, int selectId, Map<String,String> data) async {
+    try{
+      int uuid = 0;
+      if(selectId == 0){
+        ///若是0 則是新增
+        uuid = DateTime.now().microsecondsSinceEpoch;
+        String? tmpChildList = prefs.getString("${parentId}_r");
+        if(tmpChildList!=null){
+          tmpChildList = "$tmpChildList$uuid,";
+        }else{
+          tmpChildList = "$uuid,";
+        }
+        await prefs.setString("${parentId}_r", tmpChildList);
+      }else{
+        uuid = selectId;
+      }
+
+      ///修改內容
+      await prefs.setString('${uuid}_p', parentId.toString());
+      await prefs.setString('${uuid}_j', data['json']!);
+      await prefs.setString('${uuid}_t', data['title']!);
+      await prefs.setString('${uuid}_d', data['date']!);
+
+      return 1;
+    }catch(err){
+      if (kDebugMode) {
+        print("EditRecord Fail ${err.toString()}");
+      }
+      return 0;
+    }
   }
 
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:card_book_flutter/chart/pie_chart_sample2.dart';
+import 'package:card_book_flutter/counter/record_edit_page.dart';
 import 'package:card_book_flutter/dialog/dialog_helper.dart';
 import 'package:card_book_flutter/setting/about.dart';
 import 'package:flutter/cupertino.dart';
@@ -130,7 +131,8 @@ class _CounterPageState extends State<CounterPage> {
                 onPressed: () {
                   if (selectList.length == 1) {
                     Map<String, String> data = {};
-                    if(StaticFunction.prefs.containsKey("${selectList[0]}_ch")){
+                    if (StaticFunction.prefs
+                        .containsKey("${selectList[0]}_ch")) {
                       data['category'] = "1";
                     }
                     data['color'] =
@@ -143,9 +145,9 @@ class _CounterPageState extends State<CounterPage> {
                         context: context,
                         builder: (context) {
                           return DialogHelper.showCounterEdit(context, data,
-                              (data) {
-                            _editCounter(selectList[0], data);
+                              (data, addNote) {
                             Navigator.pop(context);
+                            _editCounter(selectList[0], data, addNote);
                           });
                         });
                   } else if (selectList.length > 1) {
@@ -214,9 +216,39 @@ class _CounterPageState extends State<CounterPage> {
     _reloadList();
   }
 
-  void _editCounter(int selectId, data) async {
-   await StaticFunction.getInstance().editCounter(selectId, data);
-    _reloadList();
+  void _editCounter(int selectId, data, int addNote) async {
+    if (addNote == 1) {
+      startForResult(RecordEditPage(
+        parentId: selectList[0].toString(),
+        selectId: "0",
+        title: StaticFunction.prefs.getString("${selectList[0]}_t")!,
+      ));
+    } else if (addNote == 2) {
+      List<String> textList = [];
+      String tmpList = StaticFunction.prefs.getString("${selectList[0]}_r")!;
+      for (int i = 0; i < tmpList.split(",").length; i++) {
+        if (tmpList.split(",")[i].isNotEmpty) {
+          textList.add(
+              StaticFunction.prefs.getString("${tmpList.split(",")[i]}_t")!);
+        }
+      }
+      showDialog(
+          context: context,
+          builder: (context) {
+            return DialogHelper.showChoiceDialog(
+                context, "Record List", "Select a record", textList, (value) {
+              Navigator.pop(context);
+              startForResult(RecordEditPage(
+                parentId: selectList[0].toString(),
+                selectId: tmpList.split(",")[value],
+                title: StaticFunction.prefs.getString("${selectList[0]}_t")!,
+              ));
+            });
+          });
+    } else {
+      await StaticFunction.getInstance().editCounter(selectId, data);
+      _reloadList();
+    }
   }
 
   void _incrementCategory() async {
