@@ -33,3 +33,26 @@ first commit.
 2.rename weight in counter.dart to value.
 3.write function to add, delete, edit category.
 4.build category. (in counter.dart)
+
+2023/7/12
+1.Add google ad sdk and support class.
+2.Using google test id for testing.
+3.add more new page.
+4.build about.dart to show licenses.
+5.update minSdk to 24.(for google ad)
+
+2023/7/13
+1.Add flutter_colorpicker package.
+2.Change a little UI.
+3.Keep going to finish edit_dialog.dart.
+4.build keystore.
+5.run flutter build appbundle
+6.Edit play store information.
+7.Publish aab to internal test.
+
+2023/7/17
+1.Integrate flutter_quill.
+2.Build Record Edit Page.
+3.Check function to build new record and list.
+4.Fix gradle to let codemagic web start work.
+
