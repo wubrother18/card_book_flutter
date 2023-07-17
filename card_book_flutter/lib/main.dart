@@ -3,10 +3,12 @@ import 'package:card_book_flutter/static_function.dart';
 import 'package:card_book_flutter/tool/hide_keyboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'generated/l10n.dart';
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -31,13 +33,6 @@ class MyApp extends StatelessWidget {
 
   ({super.key});
 
-  Future<void> initPrefs() async {
-    // Obtain shared preferences.
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    StaticFunction.prefs = prefs;
-  }
-
-
     // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -50,14 +45,21 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return HideKeyboard(
               child: MaterialApp(
-                title: 'Card Book',
+                localizationsDelegates: const [
+                  S.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: S.delegate.supportedLocales,
+                title: 'CountDeck',
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(
                       seedColor: Colors.deepPurple),
                   useMaterial3: true,
                 ),
-                home:  const CounterPage( parentId: "0",title: "主要分類",),
+                home:  CounterPage( parentId: "0",title: "",),
               ));
         });
   }

@@ -1,22 +1,27 @@
 import 'dart:math';
 
+import 'dart:io';
+import 'package:path/path.dart' hide context;
 import 'package:card_book_flutter/chart/pie_chart_sample2.dart';
 import 'package:card_book_flutter/counter/record_edit_page.dart';
 import 'package:card_book_flutter/dialog/dialog_helper.dart';
 import 'package:card_book_flutter/setting/about.dart';
+import 'package:card_book_flutter/upload/google_drive.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:path_provider/path_provider.dart';
 import '../admob/ad_helper.dart';
+import '../generated/l10n.dart';
 import '../static_function.dart';
 import 'counter.dart';
 
 class CounterPage extends StatefulWidget {
   final String parentId;
-  final String title;
+  String title;
 
-  const CounterPage({super.key, required this.parentId, required this.title});
+  CounterPage({super.key, required this.parentId,  required this.title});
 
   @override
   State<CounterPage> createState() => _CounterPageState();
@@ -67,8 +72,8 @@ class _CounterPageState extends State<CounterPage> {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          return DialogHelper.showWarning(context, "Delete",
-                              "Do you want to delete them all?", "YES", () {
+                          return DialogHelper.showWarning(context, S.of(context).delete,
+                              S.of(context).delete_question, S.of(context).yes, () {
                             Navigator.pop(context);
                             for (int i = 0; i < selectList.length; i++) {
                               _decrementCounter(selectList[i].toString());
@@ -95,8 +100,8 @@ class _CounterPageState extends State<CounterPage> {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          return DialogHelper.showWarning(context, "Switch",
-                              "Please select two item to swap.", "OK", () {
+                          return DialogHelper.showWarning(context, S.of(context).swap,
+                              S.of(context).switch_question, S.of(context).ok, () {
                             Navigator.pop(context);
                           });
                         });
@@ -156,9 +161,9 @@ class _CounterPageState extends State<CounterPage> {
                         builder: (context) {
                           return DialogHelper.showWarning(
                               context,
-                              "Edit",
-                              "Please select only one item at a time to edit.",
-                              "OK", () {
+                              S.of(context).edit,
+                              S.of(context).edit_question,
+                              S.of(context).ok, () {
                             Navigator.pop(context);
                           });
                         });
@@ -166,20 +171,21 @@ class _CounterPageState extends State<CounterPage> {
                 },
                 icon: const Icon(Icons.edit),
               )
-            : Container()
-        //     IconButton(
-        //         onPressed: () {
-        //           // ///testing code
-        //           // String? tmpChild =
-        //           //     StaticFunction.prefs.getString("${widget.parentId}_ch");
-        //           // String selectId = "";
-        //           // if (tmpChild != null) {
-        //           //   selectId = tmpChild.split(",")[0];
-        //           // }
-        //           // _decrementCounter(selectId);
-        //         },
-        //         icon: const Icon(Icons.settings),
-        //       ),
+            :
+            IconButton(
+                onPressed: () {
+                  // ///testing code
+                  // String? tmpChild =
+                  //     StaticFunction.prefs.getString("${widget.parentId}_ch");
+                  // String selectId = "";
+                  // if (tmpChild != null) {
+                  //   selectId = tmpChild.split(",")[0];
+                  // }
+                  // _decrementCounter(selectId);
+                  _showSnackBar(S.of(context).help_message);
+                },
+                icon: const Icon(Icons.help),
+              ),
       ],
     );
   }
@@ -194,7 +200,7 @@ class _CounterPageState extends State<CounterPage> {
   }
 
   void _incrementCounter() async {
-    await StaticFunction.getInstance().addCounter(int.parse(widget.parentId));
+    await StaticFunction.getInstance().addCounter(int.parse(widget.parentId),context);
     _reloadList();
   }
 
@@ -236,7 +242,7 @@ class _CounterPageState extends State<CounterPage> {
           context: context,
           builder: (context) {
             return DialogHelper.showChoiceDialog(
-                context, "Record List", "Select a record", textList, (value) {
+                context, S.of(context).record_List, S.of(context).record_describe, textList, (value) {
               Navigator.pop(context);
               startForResult(RecordEditPage(
                 parentId: selectList[0].toString(),
@@ -252,7 +258,7 @@ class _CounterPageState extends State<CounterPage> {
   }
 
   void _incrementCategory() async {
-    await StaticFunction.getInstance().addCategory(int.parse(widget.parentId));
+    await StaticFunction.getInstance().addCategory(int.parse(widget.parentId), context);
     _reloadList();
   }
 
@@ -331,6 +337,11 @@ class _CounterPageState extends State<CounterPage> {
 
   @override
   Widget build(BuildContext context) {
+    if(widget.title.isEmpty){
+      setState(() {
+        widget.title = S.of(context).main_category;
+      });
+    }
     // TODO: implement build
     return Scaffold(
       appBar: _appBar(),
@@ -375,7 +386,7 @@ class _CounterPageState extends State<CounterPage> {
                             _incrementCounter();
                           },
                           icon: const Icon(Icons.timer),
-                          label: const Text('新增計數項目')),
+                          label: Text(S.of(context).new_count)),
                     ),
                     PopupMenuItem(
                       value: 1,
@@ -384,7 +395,7 @@ class _CounterPageState extends State<CounterPage> {
                             _incrementCategory();
                           },
                           icon: const Icon(Icons.folder),
-                          label: const Text('新增分類項目')),
+                          label: Text(S.of(context).new_category)),
                     ),
                   ];
                 },
@@ -415,7 +426,7 @@ class _CounterPageState extends State<CounterPage> {
                         // color: Colors.white,
                       ),
                       onPressed: () {
-                        _showSnackBar("More exciting features coming soon!");
+                        _showSnackBar(S.of(context).coming_soon);
                       },
                     ),
                     IconButton(
@@ -424,7 +435,17 @@ class _CounterPageState extends State<CounterPage> {
                         // color: Colors.white,
                       ),
                       onPressed: () {
-                        _showSnackBar("upload to google drive");
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return DialogHelper.showWarning(
+                                  context,
+                                  S.of(context).export,
+                                  S.of(context).export_describe,S.of(context).yes, () {
+                                Navigator.pop(context);
+                                _exportSharePreference();
+                              });
+                            });
                       },
                     ),
                     IconButton(
@@ -433,7 +454,7 @@ class _CounterPageState extends State<CounterPage> {
                         // color: Colors.white,
                       ),
                       onPressed: () {
-                        _showSnackBar("Change settings or see licenses");
+                        // _showSnackBar("Change settings or see licenses");
                         startForResult(AboutPage());
                       },
                     ),
@@ -495,5 +516,44 @@ class _CounterPageState extends State<CounterPage> {
         },
       ),
     );
+  }
+
+  Future<String> dirpath() async {
+    String downloadDirectory = "";
+    if (Platform.isAndroid) {
+      downloadDirectory = Directory('/storage/emulated/0/Download').path;
+    } else {
+      final downloadFolder = await getDownloadsDirectory();
+      if (downloadFolder != null) {
+        downloadDirectory = downloadFolder.path;
+      }
+    }
+    return downloadDirectory;
+  }
+
+  Future<void> _exportSharePreference() async {
+    // Saves the image to applications directory
+    final appDocDir = await getApplicationDocumentsDirectory();
+    String appDocDirString = appDocDir.path;
+    appDocDirString = appDocDirString.replaceAll("app_flutter", "shared_prefs");
+
+    print("dir $appDocDirString");
+    final file = await File(
+        '$appDocDirString/${basename('FlutterSharedPreferences.xml')}');
+    // return file.path.toString();
+
+    // Read the file
+    final contents = await file.readAsString();
+
+    final outPutDir = await dirpath();
+    final fileOut =
+        File('${outPutDir.toString()}/${basename('SharedPreferences.xml')}')
+            .writeAsString(contents)
+            .whenComplete(() =>
+                _showSnackBar(S.of(context).export_success))
+            .catchError((err) {
+      _showSnackBar("${S.of(context).export_fail} $err");
+    });
+    // return" file.path.toString()";
   }
 }

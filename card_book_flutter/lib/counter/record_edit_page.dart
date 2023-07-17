@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' hide context;
 import 'package:path_provider/path_provider.dart';
 
+import '../generated/l10n.dart';
 import '../static_function.dart';
 import '../tool/time_stamp_embed_widget.dart';
 
@@ -55,7 +56,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
       ),
       title: Center(
           child: Text(
-        "${widget.title} 的記錄",
+        "${widget.title} ${S.of(context).record_of}",
         textAlign: TextAlign.center,
         style: TextStyle(color: Colors.black, fontSize: 20.w),
       )),
@@ -137,7 +138,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black, fontSize: 20.w),
                     decoration: InputDecoration(
-                      labelText: "Title",
+                      labelText: S.of(context).title,
                       isCollapsed: true,
                       contentPadding: EdgeInsets.only(top: 10.h, bottom: 10.h),
                       enabledBorder: const OutlineInputBorder(
@@ -230,7 +231,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
               color: Colors.white,
             ),
             iconSize: 30.w,
-            tooltip: "SAVE",
+            tooltip: S.of(context).save,
           ),
         ));
   }
@@ -305,7 +306,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
       focusNode: _focusNode,
       autoFocus: false,
       readOnly: false,
-      placeholder: 'Add Note Here.',
+      placeholder: S.of(context).add_here,
       enableSelectionToolbar: isMobile(),
       expands: false,
       padding: EdgeInsets.zero,
@@ -390,7 +391,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
 
   void _save(jsonString) async {
     if (titleController.text.isEmpty) {
-      _showSnackBar("Title can't be empty!!");
+      _showSnackBar(S.of(context).title_warning);
       return;
     }
 
@@ -405,9 +406,9 @@ class _RecordEditPageState extends State<RecordEditPage> {
     if (mounted) {
       switch (result) {
         case 0:
-          _showSnackBar("Fail to save record. Please try again.");
+          _showSnackBar(S.of(context).save_err);
         case 1:
-          _showSnackBar("Save succeed!");
+          _showSnackBar(S.of(context).save_success);
           Navigator.pop(context);
       }
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../counter/counter.dart';
+import '../generated/l10n.dart';
 import '../static_function.dart';
 import 'indicator.dart';
 
@@ -33,7 +34,7 @@ class PieChart2State extends State<PieChartSample2> {
       ),
       title: Center(
           child: Text(
-            "圓餅圖",
+            S.of(context).chart,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black54),
           )),
@@ -73,6 +74,7 @@ class PieChart2State extends State<PieChartSample2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
+      backgroundColor: Colors.grey,
       body: AspectRatio(
         aspectRatio: 1.3,
         child: Row(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../generated/l10n.dart';
+
 class EditDialog extends StatefulWidget {
   String title, text;
   Map<String, String> data;
@@ -23,6 +25,15 @@ class _EditDialogState extends State<EditDialog> {
   TextEditingController colorController = TextEditingController();
 
   String color = "";
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: Text(message),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -72,7 +83,7 @@ class _EditDialogState extends State<EditDialog> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black, fontSize: 20.w),
                   decoration: InputDecoration(
-                    labelText: "Title",
+                    labelText: S.of(context).title,
                     isCollapsed: true,
                     contentPadding: EdgeInsets.only(top: 10.h, bottom: 10.h),
                     enabledBorder: const OutlineInputBorder(
@@ -90,7 +101,7 @@ class _EditDialogState extends State<EditDialog> {
                       ),
                     ),
                   ),
-                  maxLength: 5,
+                  maxLength: 8,
                   onChanged: (value) {},
                 ),
                 SizedBox(
@@ -105,7 +116,7 @@ class _EditDialogState extends State<EditDialog> {
                           isCollapsed: true,
                           contentPadding:
                               EdgeInsets.only(top: 10.h, bottom: 10.h),
-                          labelText: "Value",
+                          labelText: S.of(context).value,
                           enabledBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                             borderSide: BorderSide(
@@ -121,7 +132,7 @@ class _EditDialogState extends State<EditDialog> {
                             ),
                           ),
                         ),
-                        maxLength: 5,
+                        maxLength: 8,
                         keyboardType: TextInputType.number,
                       )
                     : Container(),
@@ -138,7 +149,7 @@ class _EditDialogState extends State<EditDialog> {
                       width: 150.w,
                       height: 30.h,
                       child: Text(
-                        "Select Color:",
+                        S.of(context).select_color,
                         textAlign: TextAlign.left,
                         style: TextStyle(color: Colors.black, fontSize: 20.w),
                       ),
@@ -152,7 +163,7 @@ class _EditDialogState extends State<EditDialog> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: const Text('Pick a color!'),
+                                title: Text(S.of(context).select_color),
                                 content: SingleChildScrollView(
                                   // child: ColorPicker(
                                   //   pickerColor: Color(int.parse(color)),
@@ -192,7 +203,7 @@ class _EditDialogState extends State<EditDialog> {
                                 ),
                                 actions: <Widget>[
                                   ElevatedButton(
-                                    child: const Text('OK'),
+                                    child:  Text(S.of(context).ok),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -229,9 +240,9 @@ class _EditDialogState extends State<EditDialog> {
                                     builder: (context) {
                                       return DialogHelper.showWarning(
                                           context,
-                                          "Change Lost",
-                                          "If you haven't save yet. New data change might be lost.",
-                                          "Ignore",
+                                          S.of(context).lost_warning,
+                                          S.of(context).lost_warning_describe,
+                                          S.of(context).ignore,
                                           () {
                                             widget.positive.call(widget.data, 1);
                                           });
@@ -244,7 +255,7 @@ class _EditDialogState extends State<EditDialog> {
                               Icons.note_add,
                               size: 30.w,
                             ),
-                            tooltip: "add new note",
+                            tooltip: S.of(context).add_note,
                           ),
                           IconButton(
                             onPressed: () {
@@ -254,13 +265,17 @@ class _EditDialogState extends State<EditDialog> {
                               Icons.pageview,
                               size: 30.w,
                             ),
-                            tooltip: "view note list",
+                            tooltip: S.of(context).view_note,
                           ),
                           Align(
                             alignment: Alignment.bottomRight,
                             child: MaterialButton(
                                 color: Colors.teal,
                                 onPressed: () {
+                                  if(titleController.text.isEmpty){
+                                    _showSnackBar(S.of(context).title_warning);
+                                    return;
+                                  }
                                   widget.data['color'] = colorController.text;
                                   widget.data['value'] = valueController.text;
                                   widget.data['title'] = titleController.text;
@@ -283,13 +298,17 @@ class _EditDialogState extends State<EditDialog> {
                               Icons.photo,
                               size: 30.w,
                             ),
-                            tooltip: "edit picture",
+                            tooltip: S.of(context).edit_picture,
                           ),
                           Align(
                             alignment: Alignment.bottomRight,
                             child: MaterialButton(
                                 color: Colors.teal,
                                 onPressed: () {
+                                  if(titleController.text.isEmpty){
+                                    _showSnackBar(S.of(context).title_warning);
+                                    return;
+                                  }
                                   widget.data['color'] = colorController.text;
                                   widget.data['value'] = valueController.text;
                                   widget.data['title'] = titleController.text;

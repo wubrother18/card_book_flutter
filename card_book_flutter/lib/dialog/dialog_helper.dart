@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../generated/l10n.dart';
+
 class DialogHelper {
   static AlertDialog showWarning(
       BuildContext context, title, descriptions, text, Function callback) {
@@ -18,14 +20,14 @@ class DialogHelper {
 
   static Widget showCounterEdit(
       BuildContext context, Map<String, String> data, Function positive) {
-    String titleText = "Counter Edit";
+    String titleText = S.of(context).counter_edit;
     bool isCategory = false;
     if (data.containsKey('category')) {
-      titleText = "Category Edit";
+      titleText = S.of(context).category_edit;
       isCategory = true;
     }
     return _counterEditContentBox(
-        context, titleText, "SAVE", isCategory, data, positive);
+        context, titleText, S.of(context).save, isCategory, data, positive);
   }
 
   static Widget showChoiceDialog(

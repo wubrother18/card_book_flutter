@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../generated/l10n.dart';
 import '../static_function.dart';
 
 class AboutPage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _AboutPageState extends State<AboutPage> {
       ),
       title: Center(
           child: Text(
-        "關於",
+        S.of(context).about,
         textAlign: TextAlign.center,
         style: TextStyle(color: Colors.black, fontSize: 20.w),
       )),

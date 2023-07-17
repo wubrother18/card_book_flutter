@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'generated/l10n.dart';
+
 
 class StaticFunction {
   /// 單例
@@ -43,13 +45,13 @@ class StaticFunction {
 
   }
 
-  Future<void> addCounter (int parentId) async {
+  Future<void> addCounter (int parentId, context) async {
 
     var rng = Random();
     int uuid = DateTime.now().microsecondsSinceEpoch;
     int value = 0;
     String color = rng.nextInt(0xFFFFFFFF).toString();
-    String title = "項目";
+    String title = S.of(context).item;
     String record = "";
     await prefs.setString('${uuid}_p', parentId.toString());
     await prefs.setString('${uuid}_v', value.toString());
@@ -116,13 +118,13 @@ class StaticFunction {
     await prefs.setString("${parentId}_ch", tmpChildList!);
   }
 
-  Future<void> addCategory (int parentId) async {
+  Future<void> addCategory (int parentId, context) async {
 
     var rng = Random();
     int uuid = DateTime.now().microsecondsSinceEpoch;
     int value = 0;
     String color = rng.nextInt(0xFFFFFFFF).toString();
-    String title = "新分類";
+    String title = S.of(context).category;
     await prefs.setString('${uuid}_p', parentId.toString());
     await prefs.setString('${uuid}_v', value.toString());
     await prefs.setString('${uuid}_c', color.toString());
