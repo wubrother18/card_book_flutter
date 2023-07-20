@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' hide context;
 import 'package:card_book_flutter/chart/pie_chart_sample2.dart';
 import 'package:card_book_flutter/counter/record_edit_page.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../admob/ad_helper.dart';
 import '../generated/l10n.dart';
 import '../static_function.dart';
@@ -36,6 +38,8 @@ class _CounterPageState extends State<CounterPage> {
 
   // COMPLETE: Add _interstitialAd
   InterstitialAd? _interstitialAd;
+
+  static const platform = MethodChannel('package/Main');
 
   AppBar _appBar() {
     return AppBar(
@@ -532,6 +536,12 @@ class _CounterPageState extends State<CounterPage> {
   }
 
   Future<void> _exportSharePreference() async {
+    //check permission
+    var status = await Permission.storage.status;
+    if (status.isDenied) {
+      // We didn't ask for permission yet or the permission has been denied before but not permanently.
+    }
+
     // Saves the image to applications directory
     final appDocDir = await getApplicationDocumentsDirectory();
     String appDocDirString = appDocDir.path;
@@ -545,15 +555,20 @@ class _CounterPageState extends State<CounterPage> {
     // Read the file
     final contents = await file.readAsString();
 
-    final outPutDir = await dirpath();
-    final fileOut =
-        File('${outPutDir.toString()}/${basename('SharedPreferences.xml')}')
-            .writeAsString(contents)
-            .whenComplete(() =>
-                _showSnackBar(S.of(context).export_success))
-            .catchError((err) {
-      _showSnackBar("${S.of(context).export_fail} $err");
-    });
+    // final outPutDir = await dirpath();
+    // final fileOut =
+    //     File('${outPutDir.toString()}/${basename('SharedPreferences.xml')}')
+    //         .writeAsString(contents)
+    //         .whenComplete(() =>
+    //             _showSnackBar(S.of(context).export_success))
+    //         .catchError((err) {
+    //   _showSnackBar("${S.of(context).export_fail} $err");
+    // });
+    try {
+      final int result = await platform.invokeMethod('writeFile',contents);
+    } on PlatformException catch (e) {
+      _showSnackBar("${S.of(context).export_fail} $e");
+    }
     // return" file.path.toString()";
   }
 }
