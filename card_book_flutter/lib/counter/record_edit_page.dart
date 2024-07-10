@@ -120,99 +120,105 @@ class _RecordEditPageState extends State<RecordEditPage> {
         backgroundColor: Colors.grey,
         body: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
-              child: Container(
-                height: 60.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(8.w)),
-                ),
-                child: Center(
-                  child: TextField(
-                    controller: titleController,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: 20.w),
-                    decoration: InputDecoration(
-                      labelText: S.of(context).title,
-                      isCollapsed: true,
-                      contentPadding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-                      enabledBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(
+            Expanded(child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
+                    child: Container(
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
                           color: Colors.grey,
-                          width: 2,
                         ),
+                        borderRadius: BorderRadius.all(Radius.circular(8.w)),
                       ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 2,
+                      child: Center(
+                        child: TextField(
+                          controller: titleController,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: 20.w),
+                          decoration: InputDecoration(
+                            labelText: S.of(context).title,
+                            isCollapsed: true,
+                            contentPadding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 2,
+                              ),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          onChanged: (value) {},
                         ),
                       ),
                     ),
-                    onChanged: (value) {},
                   ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
-              child: Container(
-                height: 60.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(8.w)),
-                ),
-                child: CupertinoDatePicker(
-                  initialDateTime: DateTime.parse(date_inital),
-                  onDateTimeChanged: (DateTime newDate) {
-                    setState(() {
-                      date = newDate.toString();
-                    });
-                  },
-                  use24hFormat: true,
-                  minimumYear: 1999,
-                  maximumYear: 3000,
-                  minuteInterval: 1,
-                  mode: CupertinoDatePickerMode.date,
-                  dateOrder: DatePickerDateOrder.ymd,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
-              child: Container(
-                height: ScreenUtil().screenHeight - 250.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(8.w)),
-                ),
-                child: Column(
-                  children: [
-                    QuillToolbar.basic(controller: _controller!),
-                    Expanded(
-                      child: Container(
-                        child: _buildEditorArea(context),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
+                    child: Container(
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(8.w)),
                       ),
-                    )
-                  ],
-                ),
+                      child: CupertinoDatePicker(
+                        initialDateTime: DateTime.parse(date_inital),
+                        onDateTimeChanged: (DateTime newDate) {
+                          setState(() {
+                            date = newDate.toString();
+                          });
+                        },
+                        use24hFormat: true,
+                        minimumYear: 1999,
+                        maximumYear: 3000,
+                        minuteInterval: 1,
+                        mode: CupertinoDatePickerMode.date,
+                        dateOrder: DatePickerDateOrder.ymd,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 8.h, bottom: 8.h, right: 20.w, left: 20.w),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: ScreenUtil().screenHeight - 250.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(8.w)),
+                      ),
+                      child: Column(
+                        children: [
+                          QuillToolbar.simple(configurations: QuillSimpleToolbarConfigurations(controller: _controller!)),
+                          Container(
+                            child: _buildEditorArea(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            )),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -278,7 +284,7 @@ class _RecordEditPageState extends State<RecordEditPage> {
         extentOffset: offset + length,
       );
 
-      controller.updateSelection(selection, ChangeSource.REMOTE);
+      controller.updateSelection(selection, ChangeSource.remote);
 
       // _selectionType = _SelectionType.line;
 
@@ -299,34 +305,31 @@ class _RecordEditPageState extends State<RecordEditPage> {
   }
 
   Widget _buildEditorArea(BuildContext context) {
-    Widget quillEditor = QuillEditor(
-      controller: _controller!,
-      scrollController: ScrollController(),
-      scrollable: true,
-      focusNode: _focusNode,
-      autoFocus: false,
-      readOnly: false,
-      placeholder: S.of(context).add_here,
-      enableSelectionToolbar: isMobile(),
-      expands: false,
-      padding: EdgeInsets.zero,
-      onImagePaste: _onImagePaste,
-      onTapUp: (details, p1) {
-        return _onTripleClickSelection();
-      },
-      customStyles: DefaultStyles(
-        h1: DefaultTextBlockStyle(
-            const TextStyle(
-              fontSize: 32,
-              color: Colors.black,
-              height: 1.15,
-              fontWeight: FontWeight.w300,
-            ),
-            const VerticalSpacing(16, 0),
-            const VerticalSpacing(0, 0),
-            null),
-        sizeSmall: const TextStyle(fontSize: 9),
-      ),
+    Widget quillEditor = QuillEditor.basic(
+       configurations: QuillEditorConfigurations(controller: _controller!,
+         scrollable: true,
+         autoFocus: false,
+         placeholder: S.of(context).add_here,
+         enableSelectionToolbar: isMobile(supportWeb: false),
+         expands: false,
+         padding: EdgeInsets.zero,
+         onImagePaste: _onImagePaste,
+         onTapUp: (details, p1) {
+           return _onTripleClickSelection();
+         },
+         customStyles: const DefaultStyles(
+           h1: DefaultTextBlockStyle(
+               TextStyle(
+                 fontSize: 32,
+                 color: Colors.black,
+                 height: 1.15,
+                 fontWeight: FontWeight.w300,
+               ),
+               VerticalSpacing(16, 0),
+               VerticalSpacing(0, 0),
+               null),
+           sizeSmall: TextStyle(fontSize: 9),
+         ),),
     );
 
     return quillEditor;
@@ -340,44 +343,6 @@ class _RecordEditPageState extends State<RecordEditPage> {
         .writeAsBytes(imageBytes, flush: true);
     return file.path.toString();
     // return" file.path.toString()";
-  }
-
-  static void _insertTimeStamp(QuillController controller, String string) {
-    controller.document.insert(controller.selection.extentOffset, '\n');
-    controller.updateSelection(
-      TextSelection.collapsed(
-        offset: controller.selection.extentOffset + 1,
-      ),
-      ChangeSource.LOCAL,
-    );
-
-    controller.document.insert(
-      controller.selection.extentOffset,
-      TimeStampEmbed(string),
-    );
-
-    controller.updateSelection(
-      TextSelection.collapsed(
-        offset: controller.selection.extentOffset + 1,
-      ),
-      ChangeSource.LOCAL,
-    );
-
-    controller.document.insert(controller.selection.extentOffset, ' ');
-    controller.updateSelection(
-      TextSelection.collapsed(
-        offset: controller.selection.extentOffset + 1,
-      ),
-      ChangeSource.LOCAL,
-    );
-
-    controller.document.insert(controller.selection.extentOffset, '\n');
-    controller.updateSelection(
-      TextSelection.collapsed(
-        offset: controller.selection.extentOffset + 1,
-      ),
-      ChangeSource.LOCAL,
-    );
   }
 
   void _showSnackBar(String message) {
